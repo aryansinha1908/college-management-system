@@ -1,23 +1,13 @@
-const { MongoClient, ServerApiVersion } = require('mongodb');
-const uri = process.env.MONGO_URI;
+const mongoose = require("mongoose");
 
-const client = new MongoClient(uri, {
-  serverApi: {
-    version: ServerApiVersion.v1,
-    strict: true,
-    deprecationErrors: true,
-  }
-});
-
-async function run() {
+const connectToDB = async () => {
     try {
-        await client.connect();
-        console.log('Connected successfully to server');
-    
-    } finally {
-        // Ensures that the client will close when you finish/error
+        const conn = await mongoose.connect(process.env.MONGO_URI);
+        console.log("DB connected");
+        console.log("Host: ", conn.connection.host);
+    } catch (error) {
+        console.error("DB could not connect ", error.message);
     }
 }
-run().catch(console.dir);
 
-module.exports = run;
+module.exports = connectToDB;

@@ -1,29 +1,50 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 const User = require('../models/user.model');
+const PasswordToken = require('../models/passwordToken.model');
+const RefreshToken = require('../models/refreshToken.model');
 
-const generateToken = (user) => {
+const generateAccessToken= (user) => {
     const token = jwt.sign({
         userId: user._id,
         role: user.role
-    }, process.env.JWT_SECRET, {expiresIn: '15d'});
+    }, process.env.JWT_SECRET, {expiresIn: '15m'});
+    console.log("AccessToken generated");
     return token;
 }
 
-const loginUser = async (rollno, password) => {
-    const user = await User.findOne({ rollno });
+const generateRefreshToken= (user) => {
+    const token = jwt.sign({
+        userId: user._id,
+        role: user.role
+    }, process.env.JWT_SECRET, {expiresIn: '7d'});
+    console.log("RefreshToken generated");
+    return token;
+}
+
+exports.loginUser = async (rollno, password) => {
+    console.log("Start of authService.login");
+    console.log("DB readyState:", mongoose.connection.readyState);
+    const user = await User.findOne({ rollno: rollno });
 
     if (!user) {
         throw new Error("Invalid credentials");
     }
 
-    const isValidPassword = bcrypt.compare(password, user.password);
+    console.log("User exists");
+    console.log(user.password);
+    const isValidPassword = await bcrypt.compare(password, user.password);
+
     if (!isValidPassword) {
         throw new Error("Invalid credentials");
     }
+
     if (!user.isVerified){
         throw new Error("Please verify your email");
     }
+    console.log("meow");
+
     if (user.twoFactorEnabled) {
         return {
             requiresTwoFactor: true,
@@ -31,14 +52,47 @@ const loginUser = async (rollno, password) => {
             message: "Please complete 2FA process"
         };
     }
+
+    console.log("authService.login Validates");
     
-    const acessToken = generateToken(user); 
+    const refreshToken = await RefreshToken.create({
+        userId: user._id,
+        token: generateRefreshToken(user),
+        expiresAt: new Date(Date.now() + 1000*60*60*24*7)
+    });
+    const accessToken = generateAccessToken(user);
 
     return {
         requiresTwoFactor: false,
-        accessToken,
+        accessToken: accessToken,
+        refreshToken: refreshToken.token,
         user: { _id: user._id, name: user.name, email: user.email, role: user.role }
     };
 }
 
-module.exports = loginUser;
+exports.setPassword = async (token, password) => {
+    const passwordToken = await PasswordToken.findOne({ token });
+
+    if (!passwordToken || !passwordToken.userId) {
+        throw new Error("Invalid Token");
+    }
+
+    const user = await User.findOne( {_id: passwordToken.userId });
+
+    if (!user) {
+        throw new Error("User does not Exist");
+    }
+
+    if (user.isVerified === true) {
+        throw new Error("User is already Registered");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const updated = await User.updateOne( {_id: passwordToken.userId }, { $set: {password: hashedPassword, isVerified: true} });
+    const deleted = await PasswordToken.deleteOne( { _id: passwordToken._id});
+
+    return {
+        user: { _id: user._id, name: user.name, email: user.email, role: user.role }
+    }
+}

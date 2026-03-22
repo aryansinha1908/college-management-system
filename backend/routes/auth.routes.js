@@ -12,4 +12,6 @@ router.post("/reset-password", authControllers.resetPassword);
 router.post("/send-otp", authControllers.sendOtp);
 router.post("/verify-otp", authControllers.verifyOtp);
 
+router.post("/set-password", authControllers.setPassword);
+
 module.exports = router;

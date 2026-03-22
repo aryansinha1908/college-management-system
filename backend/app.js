@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const cookieParser = require("cookie-parser");
 const authRouter = require("./routes/auth.routes");
 const assignmentRouter = require("./routes/assignment.routes");
 const attendanceRouter = require("./routes/attendance.routes");
@@ -10,6 +11,7 @@ const submissionRouter = require("./routes/enrollment.routes");
 const userRouter = require("./routes/user.routes");
 
 app.use(express.json());
+app.use(cookieParser());
 
 
 // Version 1 of API
