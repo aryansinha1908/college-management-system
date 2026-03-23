@@ -22,6 +22,6 @@ app.use("/api/v1/course", courseRouter);
 app.use("/api/v1/enrollment", enrollmentRouter);
 app.use("/api/v1/grade", gradeRouter);
 app.use("/api/v1/submission", submissionRouter);
-app.use("/api/v1/user", userRouter);
+app.use("/api/v1/users", userRouter);
 
 module.exports = app;

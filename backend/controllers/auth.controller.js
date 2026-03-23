@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const cookie = require("cookie-parser");
+const jwt = require("jsonwebtoken");
 const authService = require("../services/auth.service");
 
 exports.register = async (req, res, next) => {
@@ -17,8 +18,8 @@ exports.login = async (req, res, next) => {
         console.log(rollno + " " + password);
         const result = await authService.loginUser(rollno, password);
 
-        res.cookie("accessToken", result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", samesite: 'lax', maxAge: 60 * 15 * 1000});
-        res.cookie("refreshToken", result.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", samesite: 'lax', maxAge: 60 * 60 * 24 * 7 * 1000});
+        res.cookie("accessToken", result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 30 * 1000});
+        res.cookie("refreshToken", result.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 * 1000});
 
         return res.status(200).json({
             success: true,
@@ -79,4 +80,32 @@ exports.sendOtp = async (req, res, next) => {
 }
 exports.verifyOtp = async (req, res, next) => {
     return;
+}
+
+exports.resetToken = async (req, res, next) => {
+    try {
+        const refreshToken = req.cookies?.refreshToken;
+
+        if (!refreshToken) {
+            return res.status(404).json({
+                success: false,
+                message: "Refresh Token not Found"
+            })
+        }
+        const reset = await authService.resetToken(refreshToken);
+
+        res.cookie('refreshToken', reset.newRefreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 * 1000});
+        res.cookie('accessToken', reset.newAccessToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 30 * 1000});
+
+        return res.status(200).json({
+            success: true,
+            message: "refreshToken and accessToken have been refreshed"
+        })
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "Token could not be Refreshed",
+            error: error
+        })
+    }
 }

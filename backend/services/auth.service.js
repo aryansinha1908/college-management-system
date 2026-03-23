@@ -9,7 +9,7 @@ const generateAccessToken= (user) => {
     const token = jwt.sign({
         userId: user._id,
         role: user.role
-    }, process.env.JWT_SECRET, {expiresIn: '15m'});
+    }, process.env.JWT_SECRET, {expiresIn: '30m'});
     console.log("AccessToken generated");
     return token;
 }
@@ -93,6 +93,46 @@ exports.setPassword = async (token, password) => {
     const deleted = await PasswordToken.deleteOne( { _id: passwordToken._id});
 
     return {
+        user: { _id: user._id, name: user.name, email: user.email, role: user.role }
+    }
+}
+
+exports.resetToken = async (refreshToken) => {
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+    if (!decoded) {
+        throw new Error("Invalid Token");
+    }
+
+    const token = await RefreshToken.findOne({ token : refreshToken });
+
+    if (!token) {
+        throw new Error("Invalid or expired Token");
+    }
+
+    if (token.expiresAt.getTime() < Date.now()) {
+        throw new Error("Invalid or expired Token");
+    }
+
+    const user = await User.findOne({ _id: token.userId });
+
+    if (!user) {
+        throw new Error("Invalid or expired Token");
+    }
+
+    const newAccessToken = generateAccessToken(user);
+
+    const deletedRefreshToken = await RefreshToken.deleteOne({ token: refreshToken });
+
+    const newRefreshToken = await RefreshToken.create({
+        userId: user._id,
+        token: generateRefreshToken(user),
+        expiresAt: new Date(Date.now() + 1000*60*60*24*7)
+    });
+
+    return {
+        newAccessToken: newAccessToken || undefined,
+        newRefreshToken: newRefreshToken.token,
         user: { _id: user._id, name: user.name, email: user.email, role: user.role }
     }
 }
