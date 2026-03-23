@@ -35,7 +35,34 @@ exports.login = async (req, res, next) => {
 };
 
 exports.logout = async (req, res, next) => {
-    return;
+    try{
+        const refreshToken = req.cookies?.refreshToken;
+
+        await authService.logout(refreshToken);
+
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: 'lax'
+        });
+
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: 'lax'
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "User has been logged out",
+        });
+    } catch (error) {
+        return {
+            success: false,
+            message: "Unable to logout",
+            error: error
+        }
+    }
 }
 
 exports.setPassword = async (req, res, next) => {

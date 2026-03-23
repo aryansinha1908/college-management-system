@@ -8,8 +8,12 @@ const userSchema = new mongoose.Schema({
     },
     rollno: {
         type: String,
-        minlength: [11, "Invalid Roll number"],
-        maxlength: [11, "Invalid Roll number"]
+        validate: {
+            validator: function(v) {
+                return v.length === 11;
+            },
+            message: "Roll number must be of 11 characters"
+        }
     },
     role: {
         type: String,

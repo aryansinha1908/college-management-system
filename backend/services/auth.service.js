@@ -70,6 +70,11 @@ exports.loginUser = async (rollno, password) => {
     };
 }
 
+exports.logout = async (refreshToken) => {
+    const token = await RefreshToken.deleteOne({ token: refreshToken });
+
+}
+
 exports.setPassword = async (token, password) => {
     const passwordToken = await PasswordToken.findOne({ token });
 
