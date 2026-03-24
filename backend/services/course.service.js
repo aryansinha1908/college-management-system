@@ -13,6 +13,7 @@ exports.createCourse = async (data) => {
 }
 
 exports.showCourse = async (code) => {
+    // console.log(code);
     const course = await Course.findOne({ code: code})
 
     if (!course) {
@@ -38,10 +39,9 @@ exports.updateCourse = async (code, userId, data) => {
 
 exports.deleteCourse = async (code, userId) => {
     const deletedCourse = await Course.findOneAndDelete(
-        { code: code, professorId: userId},
-        { $set: data},
-        { new: true}
+        { code: code, professorId: userId}
     )
+    // console.log(deletedCourse);
 
     if (!deletedCourse) {
         throw new Error("Course does not Exist");

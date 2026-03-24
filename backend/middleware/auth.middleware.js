@@ -14,6 +14,7 @@ const authMiddleware = (req, res, next) => {
 
         req.user = decoded;
 
+        // console.log("Auth Middleware Confirmed");
         next();
     } catch (error) {
         return res.status(401).json({

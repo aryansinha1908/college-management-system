@@ -29,7 +29,7 @@ exports.newCourse = async (req, res, next) => {
 
 exports.showCourse = async (req, res, next) => {
     try {
-        const code = req.query.id;
+        const code = req.params.id;
 
         if (!code) {
             return res.status(400).json({
@@ -56,9 +56,13 @@ exports.showCourse = async (req, res, next) => {
 
 exports.updateCourse = async (req, res, next) => {
     try {
-        const code = req.query.id;
+        const code = req.params.id;
         const userId = req.user.userId;
         const data = req.body;
+
+        // console.log(code);
+        // console.log(userId);
+        // console.log(data);
 
         const updatedCourse = await courseService.updateCourse(code, userId, data);
 
@@ -70,7 +74,7 @@ exports.updateCourse = async (req, res, next) => {
     } catch (error){
         return res.status(400).json({
             success: false,
-            message: "Course could be Updated",
+            message: "Course could not be Updated",
             error: error
         })
     }
@@ -78,20 +82,23 @@ exports.updateCourse = async (req, res, next) => {
 
 exports.deleteCourse = async (req, res, next) => {
     try {
-        const code = req.query.id;
+        const code = req.params.id;
         const userId = req.user.userId;
+
+        // console.log(code);
+        // console.log(userId);
 
         const deletedCourse = await courseService.deleteCourse(code, userId);
 
         return res.status(200).json({
             success: true,
             message: "Course Deleted successfully",
-            updatedCourse:deletedCourse 
+            updatedCourse: deletedCourse 
         })
     } catch (error) {
         return res.status(400).json({
             success: false,
-            message: "Course could be Deleted",
+            message: "Course could not be Deleted",
             error: error
         })
     }

@@ -1,5 +1,6 @@
-const roleMiddleware = (...allowedRoles) => {
+const roleMiddleware = (allowedRoles) => {
     return (req, res, next) => {
+        // console.log("Role Middleware Start");
         if (!req.user || !req.user.role) {
             return res.status(401).json({
                 success: false,
@@ -16,6 +17,7 @@ const roleMiddleware = (...allowedRoles) => {
             });
         }
 
+        // console.log("Role Middleware Confirmed");
         next();
     }
 }

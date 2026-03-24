@@ -16,12 +16,12 @@ app.use(cookieParser());
 
 // Version 1 of API
 app.use("/api/v1/auth", authRouter);
-app.use("/api/v1/assignment", assignmentRouter);
+app.use("/api/v1/assignments", assignmentRouter);
 app.use("/api/v1/attendance", attendanceRouter);
-app.use("/api/v1/course", courseRouter);
-app.use("/api/v1/enrollment", enrollmentRouter);
-app.use("/api/v1/grade", gradeRouter);
-app.use("/api/v1/submission", submissionRouter);
+app.use("/api/v1/courses", courseRouter);
+app.use("/api/v1/enrollments", enrollmentRouter);
+app.use("/api/v1/grades", gradeRouter);
+app.use("/api/v1/submissions", submissionRouter);
 app.use("/api/v1/users", userRouter);
 
 module.exports = app;

@@ -4,13 +4,14 @@ const mongoose = require('mongoose');
 const User = require('../models/user.model');
 const PasswordToken = require('../models/passwordToken.model');
 const RefreshToken = require('../models/refreshToken.model');
+const hashUtils = require('../utils/hash');
 
 const generateAccessToken= (user) => {
     const token = jwt.sign({
         userId: user._id,
         role: user.role
     }, process.env.JWT_SECRET, {expiresIn: '30m'});
-    console.log("AccessToken generated");
+    // console.log("AccessToken generated");
     return token;
 }
 
@@ -19,22 +20,76 @@ const generateRefreshToken= (user) => {
         userId: user._id,
         role: user.role
     }, process.env.JWT_SECRET, {expiresIn: '7d'});
-    console.log("RefreshToken generated");
+    // console.log("RefreshToken generated");
     return token;
 }
 
+const generatePasswordToken = (user) => {
+    const token = jwt.sign({
+        userId: user._id,
+        purpose: "set-password"
+    }, process.env.JWT_SECRET, {expiresIn: '14d'});
+    console.log("PasswordToken generated: ", token);
+    return token;
+}
+
+exports.register = async (data) => {
+    // console.log("authService.register Start");
+    // console.log(data);
+    const hashedPassword = await bcrypt.hash(data.password, 10);
+    // console.log(hashedPassword);
+    
+    const exists = await User.findOne({ email: data.email });
+    // console.log("User checked");
+
+    if (exists) {
+        throw new Error("User Already Exists");
+    }
+
+    data.password = hashedPassword;
+    data.isVerified = false;
+    data.twoFactorEnabled = false;
+
+    const registered = await User.create(data);
+    const cleanUser = registered.toObject();
+
+    // console.log(cleanUser);
+    if (!registered) {
+        throw new Error("Failed to Create User");
+    }
+
+    // console.log(String(cleanUser._id));
+    const hashedToken = await hashUtils.hashToken(generatePasswordToken(cleanUser));
+    // const hashedToken = generatePasswordToken(cleanUser);
+    // console.log(hashedToken);
+
+    const passwordToken = await PasswordToken.create({
+        userId: cleanUser._id.toString(),
+        token: hashedToken,
+        expiresAt: new Date(Date.now() + 1000*60*60*24*15)
+    });
+
+    // console.log("User has been created");
+    // console.log("authService.register End")
+
+    return {
+        newUser: registered,
+        passwordToken: passwordToken
+    }
+}
+
 exports.loginUser = async (rollno, password) => {
-    console.log("Start of authService.login");
-    console.log("DB readyState:", mongoose.connection.readyState);
+    // console.log("Start of authService.login");
     const user = await User.findOne({ rollno: rollno });
 
     if (!user) {
         throw new Error("Invalid credentials");
     }
 
-    console.log("User exists");
-    console.log(user.password);
+    // console.log("User exists");
+    // console.log(user.password);
     const isValidPassword = await bcrypt.compare(password, user.password);
+    // console.log(isValidPassword);
 
     if (!isValidPassword) {
         throw new Error("Invalid credentials");
@@ -76,7 +131,11 @@ exports.logout = async (refreshToken) => {
 }
 
 exports.setPassword = async (token, password) => {
-    const passwordToken = await PasswordToken.findOne({ token });
+    token = hashUtils.hashToken(token);
+    console.log(token);
+    const passwordToken = await PasswordToken.findOne({ token: token });
+
+    console.log(passwordToken);
 
     if (!passwordToken || !passwordToken.userId) {
         throw new Error("Invalid Token");
@@ -127,7 +186,7 @@ exports.resetToken = async (refreshToken) => {
 
     const newAccessToken = generateAccessToken(user);
 
-    const deletedRefreshToken = await RefreshToken.deleteOne({ token: refreshToken });
+    const deletedRefreshToken = await RefreshToken.deleteMany({ userId: user._id });
 
     const newRefreshToken = await RefreshToken.create({
         userId: user._id,

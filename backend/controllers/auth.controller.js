@@ -4,7 +4,39 @@ const jwt = require("jsonwebtoken");
 const authService = require("../services/auth.service");
 
 exports.register = async (req, res, next) => {
-    const { name, password } = req.body;
+    try {
+        const data = req.body;
+
+        // console.log(data);
+        if (!data.name || !data.email || !data.password || !data.role) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Data"
+            })
+        }
+
+        if (data.role === "admin") {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid Data"
+            })
+        }
+
+        const registered = await authService.register(data);
+
+        return res.status(201).json({
+            success: true,
+            message: "User has been registered",
+            createdUser: registered.newUser,
+            passwordToken: registered.passwordToken
+        })
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "User Could Not be Registered",
+            error: error
+        })
+    }
 }
 
 exports.login = async (req, res, next) => {
@@ -67,7 +99,10 @@ exports.logout = async (req, res, next) => {
 
 exports.setPassword = async (req, res, next) => {
     try {
-        const { password, confirmPassword, token } = req.body;
+        const { password, confirmPassword } = req.body;
+        const token = req.query.token;
+
+        console.log(token);
 
         if (password !== confirmPassword){
             return res.status(400).json({
