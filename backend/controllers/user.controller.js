@@ -6,10 +6,13 @@ exports.showProfile = async (req, res, next) => {
     try {
         const user = req.user;
 
+        const data = await userService.showProfile(user.userId);
+        // console.log(user);
+
         return res.status(200).json({
             success: true,
             message: "User Found",
-            user: user
+            user: data
         });
     } catch (error) {
         return res.status(404).json({

@@ -10,6 +10,16 @@ exports.showUser = async (userId) => {
     return user;
 }
 
+exports.showProfile = async (userId) => {
+    const user = await User.findOne({ _id: userId });
+
+    if (!user) {
+        throw new Error("Failed to Find User");
+    }
+
+    return user;
+}
+
 exports.updateProfile = async (userId, updateData) => {
     const updated = await User.findOneAndUpdate( { _id:userId }, {$set: { ...updateData }}, { new: true });
 

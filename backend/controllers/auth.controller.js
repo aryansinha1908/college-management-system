@@ -44,10 +44,10 @@ exports.login = async (req, res, next) => {
         const { rollno, password } = req.body;
 
         if (!rollno|| !password){
-            return res.status(400).json({ message: "Roll number and Password are required" });
+            return res.status(400).json({ message: "Roll Number and Password Are Required" });
         }
 
-        console.log(rollno + " " + password);
+        // console.log(rollno + " " + password);
         const result = await authService.loginUser(rollno, password);
 
         res.cookie("accessToken", result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 30 * 1000});
@@ -60,7 +60,7 @@ exports.login = async (req, res, next) => {
     } catch (error) {
         return res.status(401).json({
             success: false,
-            message: "Invalid credentials",
+            message: "Invalid Credentials",
             error: error
         })
     }

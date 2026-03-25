@@ -98,7 +98,6 @@ exports.loginUser = async (rollno, password) => {
     if (!user.isVerified){
         throw new Error("Please verify your email");
     }
-    console.log("meow");
 
     if (user.twoFactorEnabled) {
         return {
@@ -108,7 +107,7 @@ exports.loginUser = async (rollno, password) => {
         };
     }
 
-    console.log("authService.login Validates");
+    // console.log("authService.login Validates");
     
     const refreshToken = await RefreshToken.create({
         userId: user._id,
