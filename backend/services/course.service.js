@@ -23,7 +23,15 @@ exports.showCourse = async (code) => {
     return course;
 }
 
+exports.showAllCourses = async () => {
+
+    const courses = await Course.find();
+
+    return courses;
+}
+
 exports.updateCourse = async (code, userId, data) => {
+
     const updatedCourse = await Course.findOneAndUpdate(
         { code: code, professorId: userId },
         { $set: data },
@@ -38,6 +46,7 @@ exports.updateCourse = async (code, userId, data) => {
 }
 
 exports.deleteCourse = async (code, userId) => {
+
     const deletedCourse = await Course.findOneAndDelete(
         { code: code, professorId: userId}
     )

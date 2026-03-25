@@ -54,6 +54,26 @@ exports.showCourse = async (req, res, next) => {
     }
 }
 
+exports.showAllCourses = async (req, res, next) => {
+    try {
+        const user = req.user;
+
+        const coursesData = await courseService.showAllCourses();
+
+        return res.status(200).json({
+            success: true,
+            message: "Courses Found",
+            courses: coursesData
+        })
+    } catch (error) {
+        return res.status(404).json({
+            success: false,
+            message: "Course Data Not Found",
+            error: error
+        })
+    }
+}
+
 exports.updateCourse = async (req, res, next) => {
     try {
         const code = req.params.id;

@@ -5,14 +5,10 @@ const enrollmentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-    courseId: {
+    code: {
         type: String,
         required: true
-    },
-    enrolledAt: {
-        type: Date,
-        required: true
     }
-});
+}, { timestamps: true });
 
 module.exports = mongoose.model('enrollment', enrollmentSchema);
