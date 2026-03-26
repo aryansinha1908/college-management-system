@@ -1,13 +1,17 @@
+import { useAuth } from '../context/AuthContext';
 import { Box, Flex, VStack, Text, Button, Icon, Divider } from '@chakra-ui/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { FiUser, FiUsers, FiBookOpen, FiFileText, FiCheckSquare, FiCalendar, FiLogOut, FiBook } from 'react-icons/fi';
 import { LuBookPlus } from "react-icons/lu"
 import { SiBookstack } from "react-icons/si";
+import api from '../api/axios';
 
 function Sidebar() {
+    const { user } = useAuth();
     const location = useLocation(); 
     const navigate = useNavigate();
+    const { setUser, setIsAuthenticated } = useAuth();
 
     const navItems = [
         { id: 'profile', name: 'Profile', path: '/dashboard', roles:['student', 'professor', 'admin'], visible: true , protected:true, icon: FiUser },
@@ -21,13 +25,15 @@ function Sidebar() {
         { id: 'calendar', name: 'Academic Calendar', path: '/calendar', roles:['student', 'professor', 'admin'], visible: false , protected:false , icon: FiCalendar },
     ];
 
+    const visibleNavItems = navItems.filter((item) => item.roles.includes(user.role));
+
     const handleLogout = async () => {
         try {
-            await axios.post(
-                "http://localhost:3000/api/v1/users/logout", 
-                {}, 
-                { withCredentials: true }
-            );
+            api.post("/auth/logout", {});
+
+            setUser(null);
+            setIsAuthenticated(false);
+
             navigate('/login', { replace: true });
         } catch (error) {
             console.error("Logout failed:", error);
@@ -61,8 +67,8 @@ function Sidebar() {
                 </Text>
 
                 <VStack align="stretch" spacing={2}>
-                    {navItems.map((item) => {
-                        const isActive = location.pathname === item.path;
+                    {visibleNavItems.map((item) => {
+                        const isActive = (location.pathname === item.path) && (item.roles.includes(user.role));
 
                         return (
                             <Link to={item.path} key={item.name}>

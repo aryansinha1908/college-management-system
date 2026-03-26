@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from "react-router-dom";
 import { Box, Button, Flex, FormControl, FormLabel, Heading, Input, Stack, Text, Alert, AlertIcon } from '@chakra-ui/react';
-import axios from 'axios';
+import { useAuth } from '../context/AuthContext';
+import api from '../api/axios';
 
 const LoginPage = () => {
+    const { setUser, checkAuth } = useAuth();
     const navigate = useNavigate();
     const [rollNumber, setRollNumber] = useState('');
     const [password, setPassword] = useState('');
@@ -16,14 +18,12 @@ const LoginPage = () => {
         console.log("Submitting:", { rollNumber, password });
         setIsLoading(true);
         try {
-            const response = await axios.post(
-                "http://localhost:3000/api/v1/auth/login",
-                { 
-                    rollno: rollNumber,
-                    password: password 
-                },
-                { withCredentials: true }
-            );
+            const response = await api.post("/auth/login", {
+                rollno: rollNumber,
+                password: password
+            })
+            setUser(response.data.user);
+            await checkAuth();
 
             navigate("/dashboard");
         } catch (e) {

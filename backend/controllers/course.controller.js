@@ -59,6 +59,7 @@ exports.showAllCourses = async (req, res, next) => {
         const user = req.user;
 
         const coursesData = await courseService.showAllCourses();
+        // console.log(coursesData);
 
         return res.status(200).json({
             success: true,

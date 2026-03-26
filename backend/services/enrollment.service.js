@@ -9,9 +9,21 @@ exports.enroll = async (userId, code) => {
         throw new Error("Invalid Data");
     }
 
+    const check = await Enrollment.find(
+        {
+            studentId: userId,
+            code: code
+        }
+    );
+
+    if (check.length !== 0) {
+        return check;
+    }
+    // console.log(check);
+
     const enrolled = await Enrollment.create({
         studentId: userId,
-        code: course.code,
+        code: code,
     })
 
     if (!enrolled) {
@@ -57,9 +69,8 @@ exports.getCourses = async (userId) => {
     
     const data = await Enrollment.find({ studentId: userId });
 
-    const courseData = data.map(i => i.code);
     // console.log(data);
 
-    return courseData;
+    return data;
 }
 

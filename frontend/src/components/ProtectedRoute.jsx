@@ -1,29 +1,9 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
+import { useAuth } from '../context/AuthContext';
 import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children }) {
-    const [isAuthenticated, setIsAuthenticated] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                setIsLoading(true);
-                const response = await axios.get(
-                    "http://localhost:3000/api/v1/users/profile",
-                    { withCredentials: true }
-                );
-                setIsAuthenticated(true);
-            } catch (e) {
-                console.log(e.response?.data);
-            } finally {
-                setIsLoading(false);
-            }
-        };
-
-        checkAuth();
-    }, []);
+    const { isAuthenticated, isLoading } = useAuth();
 
     if (isLoading) {
         return <div>Loading...</div>;

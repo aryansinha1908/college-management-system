@@ -41,8 +41,6 @@ exports.unenrollUser = async (req, res, next) => {
                 message: "Invalid Data"
             })
         }
-        
-        // console.log(user.userId);
 
         const enrolled = await enrollmentService.unenroll(user.userId, code);
 
