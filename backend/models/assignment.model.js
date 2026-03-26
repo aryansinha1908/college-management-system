@@ -20,6 +20,9 @@ const assignmentSchema = new mongoose.Schema({
     },
     description: {
         type: String,
+        default: function() {
+            return this.title;
+        }
     },
     dueDate: {
         type: Date,
@@ -35,6 +38,6 @@ const assignmentSchema = new mongoose.Schema({
         type: String,
         required: true
     }
-}, {timestamps})
+}, { timestamps: true })
 
 module.exports = mongoose.model('assignment', assignmentSchema);
