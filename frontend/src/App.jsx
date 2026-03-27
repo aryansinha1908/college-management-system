@@ -8,6 +8,9 @@ import CreateAssignments from './pages/CreateAssignments';
 import ManageAssignments from './pages/ManageAssignments';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
+import SubmitAssignment from "./pages/SubmitAssignment";
+import ViewSubmission from "./pages/ViewSubmission";
+import ViewSubmissions from "./pages/ViewSubmissions";
 
 function App() {
     return (
@@ -81,6 +84,36 @@ function App() {
                     <ProtectedRoute>
                         <Layout>
                             <ManageAssignments />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/submit-assignments/:assignmentId"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <SubmitAssignment />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/submissions/:id"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <ViewSubmission />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/assignments/:assignmentId/submissions"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <ViewSubmissions />
                         </Layout>
                     </ProtectedRoute>
                 }

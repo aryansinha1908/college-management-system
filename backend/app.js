@@ -8,7 +8,7 @@ const attendanceRouter = require("./routes/attendance.routes");
 const courseRouter = require("./routes/course.routes");
 const enrollmentRouter = require("./routes/enrollment.routes");
 const gradeRouter = require("./routes/grade.routes");
-const submissionRouter = require("./routes/enrollment.routes");
+const submissionRouter = require("./routes/submission.routes");
 const userRouter = require("./routes/user.routes");
 
 app.use(express.json());
