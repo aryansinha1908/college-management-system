@@ -1,4 +1,4 @@
-const assignmentsService = require("../services/assignments.service");
+const assignmentsService = require("../services/assignment.service");
 
 exports.getAllAssignments = async (req, res, next) => {
     try {

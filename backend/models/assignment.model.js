@@ -26,13 +26,7 @@ const assignmentSchema = new mongoose.Schema({
     },
     dueDate: {
         type: Date,
-        validate: {
-            validator: function(v) {
-                const creationDate = this.createdAt || new Date();
-
-                return v > creationDate;
-            }
-        }
+        required: true
     },
     createdBy: {
         type: String,

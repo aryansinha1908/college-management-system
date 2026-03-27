@@ -3,6 +3,9 @@ import LoginPage from "./pages/Login";
 import Dashboard from './pages/Dashboard';
 import Courses from './pages/Courses';
 import MyCourses from './pages/MyCourses';
+import Assignments from './pages/Assignments';
+import CreateAssignments from './pages/CreateAssignments';
+import ManageAssignments from './pages/ManageAssignments';
 import ProtectedRoute from './components/ProtectedRoute';
 import Layout from './components/Layout';
 
@@ -48,6 +51,36 @@ function App() {
                     <ProtectedRoute>
                         <Layout>
                             <MyCourses/>
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/assignments"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <Assignments />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/create-assignments"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <CreateAssignments />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/manage-assignments/:assignmentId"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <ManageAssignments />
                         </Layout>
                     </ProtectedRoute>
                 }

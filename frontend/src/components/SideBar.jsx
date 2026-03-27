@@ -1,10 +1,8 @@
 import { useAuth } from '../context/AuthContext';
 import { Box, Flex, VStack, Text, Button, Icon, Divider } from '@chakra-ui/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios';
-import { FiUser, FiUsers, FiBookOpen, FiFileText, FiCheckSquare, FiCalendar, FiLogOut, FiBook } from 'react-icons/fi';
+import { FiUser, FiUsers, FiBookOpen, FiFileText, FiCheckSquare, FiCalendar, FiLogOut, FiBook, FiFilePlus } from 'react-icons/fi';
 import { LuBookPlus } from "react-icons/lu"
-import { SiBookstack } from "react-icons/si";
 import api from '../api/axios';
 
 function Sidebar() {
@@ -19,8 +17,8 @@ function Sidebar() {
         { id: 'courses', name: 'Courses', path: '/courses', roles:['student', 'professor', 'admin'], visible: true, protected:true, icon: FiBookOpen },
         { id: 'my-courses', name: 'My Courses', path: '/my-courses', roles:['student'], visible: true, protected: true, icon: FiBook},
         { id: 'create-course', name: 'Create Course', path: '/create-course', roles:['admin', 'professor'], visible: false, protected: true, icon: LuBookPlus},
-        { id: 'manage-courses', name: 'Manage Courses', path: '/manage-courses', roles:['admin', 'professor'], visible: false, protected: true, icon: SiBookstack},
-        { id: 'assignments', name: 'Assignments', path: '/assignments', roles:['student', 'professor', 'admin'], visible: false , protected:true, icon: FiFileText },
+        { id: 'assignments', name: 'Assignments', path: '/assignments', roles:['student', 'professor', 'admin'], visible: true, protected:true, icon: FiFileText },
+        { id: 'create-assignments', name: 'Create Assignments', path: '/create-assignments', roles:['professor', 'admin'], visible: true, protected:true, icon: FiFilePlus },
         { id: 'enrollments', name: 'Enrollments', path: '/enrollments', roles:['admin'], visible: false , protected:true, icon: FiCheckSquare },
         { id: 'calendar', name: 'Academic Calendar', path: '/calendar', roles:['student', 'professor', 'admin'], visible: false , protected:false , icon: FiCalendar },
     ];

@@ -4,15 +4,17 @@ const Enrollment = require("../models/enrollment.model");
 exports.getAssignmentsOfStudent = async (user) => {
 
     const courses = await Enrollment.find({ studentId: user.userId });
+    // console.log(courses);
 
-    const courseCodes = courses.map((course) => course.courseId);
+    const courseCodes = courses.map((course) => course.code);
+    // console.log(courseCodes);
 
     const assignments = await Promise.all(
         courseCodes.map((code) => 
             Assignment.find({ courseId: code })
         )
     );
-    return assignments;
+    return assignments.flat();
 }
 
 exports.getAssignmentsOfProfessor = async (professorId) => {
@@ -55,12 +57,7 @@ exports.createAssignment = async (data) => {
 
 exports.updateAssignment = async (data) => {
     
-    const updated = await Assignment.findOneAndUpdate(
-        { 
-            _id: data._id 
-        },
-        { upserts: true }
-    );
+    const updated = await Assignment.findOneAndUpdate({ _id: data._id }, data, { upserts: true });
 
     if (!updated) {
         throw new Error("Unable to Update Assignment");
