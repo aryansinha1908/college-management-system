@@ -8,6 +8,7 @@ const userSchema = new mongoose.Schema({
     },
     rollno: {
         type: String,
+        trim: true,
         validate: {
             validator: function(v) {
                 return v.length === 11;

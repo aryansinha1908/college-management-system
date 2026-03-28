@@ -40,11 +40,31 @@ exports.getStudents = async (req, res, next) => {
     }
 }
 
-exports.getSubmissions = async (req, res, next) => {
+exports.getSubmissionsFromAssignmentId = async (req, res, next) => {
     try {
         const id = req.params.id;
 
-        const submissions = await submissionService.getSubmissions(id);
+        const submissions = await submissionService.getSubmissionsFromAssignmentId(id);
+
+        return res.status(200).json({
+            success: true,
+            message: "Submissions Found",
+            submissions: submissions
+        })
+    } catch (error) {
+        return res.status(404).json({
+            success:false,
+            message: "Submissions Not Found",
+            error: error
+        })
+    }
+}
+
+exports.getSubmissionsFromStudentId = async (req, res, next) => {
+    try {
+        const id = req.params.id;
+
+        const submissions = await submissionService.getSubmissionsFromStudentId(id);
 
         return res.status(200).json({
             success: true,

@@ -1,9 +1,10 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const mongoose = require('mongoose');
+const NodemailerHelper = require('nodemailer-otp');
 const User = require('../models/user.model');
 const PasswordToken = require('../models/passwordToken.model');
 const RefreshToken = require('../models/refreshToken.model');
+const Otp = require('../models/otp.model');
 const hashUtils = require('../utils/hash');
 
 const generateAccessToken= (user) => {
@@ -34,43 +35,39 @@ const generatePasswordToken = (user) => {
 }
 
 exports.register = async (data) => {
-    // console.log("authService.register Start");
-    // console.log(data);
-    const hashedPassword = await bcrypt.hash(data.password, 10);
-    // console.log(hashedPassword);
-    
     const exists = await User.findOne({ email: data.email });
-    // console.log("User checked");
-
     if (exists) {
         throw new Error("User Already Exists");
     }
+
+    const hashedPassword = await bcrypt.hash(data.password, 10);
 
     data.password = hashedPassword;
     data.isVerified = false;
     data.twoFactorEnabled = false;
 
-    const registered = await User.create(data);
-    const cleanUser = registered.toObject();
-
-    // console.log(cleanUser);
+    console.log(data);
+    const registered = await User.create({
+        ...data,
+        password: hashedPassword,
+        isVerified: false,
+        twoFactorEnabled: false,
+    });
+    console.log(registered);
+    
     if (!registered) {
         throw new Error("Failed to Create User");
     }
 
-    // console.log(String(cleanUser._id));
-    const hashedToken = await hashUtils.hashToken(generatePasswordToken(cleanUser));
-    // const hashedToken = generatePasswordToken(cleanUser);
-    // console.log(hashedToken);
+    const cleanUser = registered.toObject();
+
+    const hashedToken = hashUtils.hashToken(generatePasswordToken(cleanUser));
 
     const passwordToken = await PasswordToken.create({
         userId: cleanUser._id.toString(),
         token: hashedToken,
-        expiresAt: new Date(Date.now() + 1000*60*60*24*15)
+        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15)
     });
-
-    // console.log("User has been created");
-    // console.log("authService.register End")
 
     return {
         newUser: registered,
@@ -78,9 +75,9 @@ exports.register = async (data) => {
     }
 }
 
-exports.loginUser = async (rollno, password) => {
+exports.loginUser = async (email, password, refreshToken) => {
     // console.log("Start of authService.login");
-    const user = await User.findOne({ rollno: rollno });
+    const user = await User.findOne({ email: email });
 
     if (!user) {
         throw new Error("Invalid credentials");
@@ -94,34 +91,28 @@ exports.loginUser = async (rollno, password) => {
     if (!isValidPassword) {
         throw new Error("Invalid credentials");
     }
-
     if (!user.isVerified){
         throw new Error("Please verify your email");
     }
 
-    if (user.twoFactorEnabled) {
-        return {
-            requiresTwoFactor: true,
-            userId: user._id,
-            message: "Please complete 2FA process"
-        };
-    }
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+    const existingRefreshToken = await RefreshToken.find({ userId: decoded.userId });
 
-    // console.log("authService.login Validates");
-    
-    const refreshToken = await RefreshToken.create({
-        userId: user._id,
-        token: generateRefreshToken(user),
-        expiresAt: new Date(Date.now() + 1000*60*60*24*7)
-    });
-    const accessToken = generateAccessToken(user);
+    if (!user.twoFactorEnabled || existingRefreshToken) {
+        // console.log("authService.login Validates");
+        
+        const accessToken = generateAccessToken(user);
+
+        return {
+            accessToken: accessToken,
+            refreshToken: existingRefreshToken,
+            user: { _id: user._id, name: user.name, email: user.email, role: user.role }
+        };
+    } 
 
     return {
-        requiresTwoFactor: false,
-        accessToken: accessToken,
-        refreshToken: refreshToken.token,
-        user: { _id: user._id, name: user.name, email: user.email, role: user.role }
-    };
+        twoFactorEnabled: true
+    }
 }
 
 exports.logout = async (refreshToken) => {
@@ -158,6 +149,26 @@ exports.setPassword = async (token, password) => {
     return {
         user: { _id: user._id, name: user.name, email: user.email, role: user.role }
     }
+}
+
+exports.sendOtp = async (userId, email) => {
+
+    const helper = new NodemailerHelper(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+
+    const otp = helper.generateOtp(6);
+
+    const otpGenerated = await Otp.create({
+        userId: userId,
+        otp: hashUtils.hashToken(otp)
+    });
+
+    try{
+        helper.sendEmail(email, 'OTP For Login','Enter the OTP on the Login Page', otp)
+    } catch (error) {
+        throw new Error("Failed to Generate OTP");
+    }
+
+    return otpGenerated;
 }
 
 exports.resetToken = async (refreshToken) => {

@@ -15,6 +15,7 @@ function ViewSubmission() {
     
     const [isFetching, setIsFetching] = useState(true);
     const [isUpdating, setIsUpdating] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     useEffect(() => {
         const fetchSubmission = async () => {
@@ -59,6 +60,7 @@ function ViewSubmission() {
                 isClosable: true,
                 position: "top-right"
             });
+            navigate(-1);
         } catch (error) {
             toast({
                 title: "Failed to update",
@@ -70,6 +72,35 @@ function ViewSubmission() {
             });
         } finally {
             setIsUpdating(false);
+        }
+    };
+
+    const handleDeleteSubmission = async () => {
+        setIsDeleting(true);
+        try {
+            await api.delete(`/submissions/${id}`);
+            
+            toast({
+                title: "Submission Deleted",
+                description: "Your submission has been permanently removed.",
+                status: "success",
+                duration: 3000,
+                isClosable: true,
+                position: "top-right"
+            });
+            
+            navigate("/assignments");
+        } catch (error) {
+            toast({
+                title: "Delete Failed",
+                description: error.response?.data?.message || "Could not delete submission.",
+                status: "error",
+                duration: 4000,
+                isClosable: true,
+                position: "top-right"
+            });
+        } finally {
+            setIsDeleting(false);
         }
     };
 
@@ -146,9 +177,20 @@ function ViewSubmission() {
                                 </Box>
                             </Box>
                             
-                            <Button variant="outline" colorScheme="gray" color="white" w="full" onClick={() => navigate("/assignments")}>
-                                Back to Assignments
-                            </Button>
+                            <Flex w="full" gap={4}>
+                                <Button 
+                                    variant="outline" 
+                                    colorScheme="red" 
+                                    flex="1" 
+                                    onClick={handleDeleteSubmission}
+                                    isLoading={isDeleting}
+                                >
+                                    Delete
+                                </Button>
+                                <Button variant="outline" colorScheme="gray" color="white" flex="1" onClick={() => navigate("/assignments")}>
+                                    Back 
+                                </Button>
+                            </Flex>
                         </VStack>
                     )}
                 </VStack>

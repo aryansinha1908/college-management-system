@@ -14,12 +14,11 @@ function Sidebar() {
     const navItems = [
         { id: 'profile', name: 'Profile', path: '/dashboard', roles:['student', 'professor', 'admin'], visible: true , protected:true, icon: FiUser },
         { id: 'users', name: 'Users', path: '/users', roles:['admin'], visible: true, protected:true, icon: FiUsers },
-        { id: 'courses', name: 'Courses', path: '/courses', roles:['student', 'professor', 'admin'], visible: true, protected:true, icon: FiBookOpen },
-        { id: 'my-courses', name: 'My Courses', path: '/my-courses', roles:['student'], visible: true, protected: true, icon: FiBook},
-        { id: 'create-course', name: 'Create Course', path: '/create-course', roles:['admin', 'professor'], visible: false, protected: true, icon: LuBookPlus},
+        { id: 'courses', name: 'Courses', path: '/courses', roles:['student', 'admin'], visible: true, protected:true, icon: FiBookOpen },
+        { id: 'my-courses', name: 'My Courses', path: '/my-courses', roles:['student', 'professor', 'admin'], visible: true, protected: true, icon: FiBook},
+        { id: 'create-course', name: 'Create Course', path: '/create-course', roles:['admin'], visible: false, protected: true, icon: LuBookPlus},
         { id: 'assignments', name: 'Assignments', path: '/assignments', roles:['student', 'professor', 'admin'], visible: true, protected:true, icon: FiFileText },
         { id: 'create-assignments', name: 'Create Assignments', path: '/create-assignments', roles:['professor', 'admin'], visible: true, protected:true, icon: FiFilePlus },
-        { id: 'enrollments', name: 'Enrollments', path: '/enrollments', roles:['admin'], visible: false , protected:true, icon: FiCheckSquare },
         { id: 'calendar', name: 'Academic Calendar', path: '/calendar', roles:['student', 'professor', 'admin'], visible: false , protected:false , icon: FiCalendar },
     ];
 

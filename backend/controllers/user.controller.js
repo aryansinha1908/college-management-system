@@ -43,6 +43,25 @@ exports.showUser = async (req, res, next) => {
     }
 }
 
+exports.showUsers = async (req, res, next) => {
+    try {
+        const users = await userService.showUsers();
+
+        return res.status(200).json({
+            success: true,
+            message: "User Found",
+            users: users
+        })
+
+    } catch (error) {
+        return res.status(404).json({
+            success: false,
+            message: "Users Not Found",
+            error: error
+        });
+    }
+}
+
 exports.updateProfile = async (req, res, next) => {
     try {
         const updateData = req.body;

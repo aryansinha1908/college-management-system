@@ -18,9 +18,16 @@ exports.getStudents = async (id) => {
     return students;
 }
 
-exports.getSubmissions = async (id) => {
+exports.getSubmissionsFromAssignmentId = async (id) => {
 
     const submissions = await Submission.find({ assignmentId: id });
+
+    return submissions;
+}
+
+exports.getSubmissionsFromStudentId = async (id) => {
+
+    const submissions = await Submission.find({ studentId: id });
 
     return submissions;
 }

@@ -11,6 +11,9 @@ import Layout from './components/Layout';
 import SubmitAssignment from "./pages/SubmitAssignment";
 import ViewSubmission from "./pages/ViewSubmission";
 import ViewSubmissions from "./pages/ViewSubmissions";
+import CreateCourse from "./pages/CreateCourses";
+import ManageUsers from "./pages/ManageUsers";
+import RegisterUser from "./pages/RegisterUser";
 
 function App() {
     return (
@@ -114,6 +117,36 @@ function App() {
                     <ProtectedRoute>
                         <Layout>
                             <ViewSubmissions />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/create-course"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <CreateCourse />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/users"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <ManageUsers />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/register"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <RegisterUser />
                         </Layout>
                     </ProtectedRoute>
                 }

@@ -3,8 +3,10 @@ import { useEffect, useState } from "react";
 import { Box, Button, Flex, Heading, Text, Spinner, Alert, AlertIcon, SimpleGrid, Badge, VStack, HStack, Icon, Menu, MenuButton, MenuList, MenuItem, IconButton, Portal } from "@chakra-ui/react";
 import { FiBook, FiMoreVertical, FiEye, FiSettings, FiEdit } from "react-icons/fi";
 import api from "../api/axios";
+import { useAuth } from "../context/AuthContext";
 
 function Courses() {
+    const { user } = useAuth();
     const [courses, setCourses] = useState([]); 
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -177,6 +179,7 @@ function Courses() {
                                         CREDITS: {course.credits || 3}
                                     </Text>
 
+                                    { user.role === "student" ?
                                     <Button
                                         size="sm"
                                         colorScheme={enrolledCourses.includes(course.code) ? "green" : "blue"}
@@ -192,6 +195,10 @@ function Courses() {
                                     >
                                         {enrolledCourses.includes(course.code) ? "Enrolled" : "Enroll"}
                                     </Button>
+                                    :
+                                        <Text>
+                                        </Text>
+                                    }
                                 </HStack>
                             </VStack>
                         </Box>

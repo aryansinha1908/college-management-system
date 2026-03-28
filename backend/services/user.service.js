@@ -9,6 +9,15 @@ exports.showUser = async (userId) => {
 
     return user;
 }
+exports.showUsers = async () => {
+    const users = await User.find();
+
+    if (!users) {
+        throw new Error("Failed to Find Users");
+    }
+
+    return users;
+}
 
 exports.showProfile = async (userId) => {
     const user = await User.findOne({ _id: userId });

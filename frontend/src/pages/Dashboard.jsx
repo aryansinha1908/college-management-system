@@ -1,10 +1,11 @@
-import axios from "axios";
-import { useContext, useEffect, useState } from "react";
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { Box, Flex, Heading, Text, VStack, Spinner, Avatar, Badge, Alert, AlertIcon, Button } from "@chakra-ui/react";
+import { Box, Flex, Heading, Text, VStack, Spinner, Avatar, Badge, Alert, AlertIcon, CloseButton } from "@chakra-ui/react";
 
 function Dashboard() {
     const { user, isLoading } = useAuth();
+    // Local state to handle dismissing the notification
+    const [hide2FAAlert, setHide2FAAlert] = useState(false);
 
     if (isLoading) {
         return (
@@ -13,36 +14,6 @@ function Dashboard() {
             </Flex>
         );
     }
-
-    // if (errorMessage) {
-    //     return (
-    //         <Flex 
-    //             minH="100vh" 
-    //             bg="gray.900" 
-    //             align="flex-start" 
-    //             justify="center" 
-    //             px={4} 
-    //             pt="20vh"
-    //         >
-    //             {/* A dark-themed error alert */}
-    //             <Alert 
-    //                 status="error" 
-    //                 bg="red.900" 
-    //                 color="red.100" 
-    //                 borderRadius="md" 
-    //                 maxW="md"
-    //                 border="1px solid"
-    //                 borderColor="red.800"
-    //             >
-    //                 <AlertIcon color="red.400" />
-    //                 <Flex direction="column">
-    //                     <Text fontWeight="bold">Error Loading Dashboard</Text>
-    //                     <Text fontSize="sm">{errorMessage}</Text>
-    //                 </Flex>
-    //             </Alert>
-    //         </Flex>
-    //     );
-    // }
 
     return (
         <Flex 
@@ -61,7 +32,6 @@ function Dashboard() {
                 border="1px solid" 
                 borderColor="gray.700"
                 maxW="xl" 
-                maxH="xl"
                 w="full"
                 textAlign="center"
             >
@@ -93,6 +63,33 @@ function Dashboard() {
                     >
                         {user?.role ? user?.role.toUpperCase() : "STUDENT"}
                     </Badge>
+
+                    {!user?.twoFactorEnabled && !hide2FAAlert && (
+                        <Alert 
+                            status="warning" 
+                            variant="subtle" 
+                            colorScheme="orange" 
+                            rounded="md" 
+                            mt={4} 
+                            textAlign="left"
+                            bg="orange.900"
+                            color="orange.100"
+                        >
+                            <AlertIcon color="orange.300" />
+                            <Box flex="1">
+                                <Text fontSize="sm" fontWeight="medium">
+                                    Enhance your account security! Please enable Two-Factor Authentication (2FA) in your settings.
+                                </Text>
+                            </Box>
+                            <CloseButton 
+                                alignSelf="flex-start" 
+                                position="relative" 
+                                right={-1} 
+                                top={-1} 
+                                onClick={() => setHide2FAAlert(true)} 
+                            />
+                        </Alert>
+                    )}
                     
                 </VStack>
             </Box>

@@ -17,7 +17,7 @@ function ViewSubmissions() {
             try {
                 const [assignmentRes, submissionsRes] = await Promise.all([
                     api.get(`/assignments/${assignmentId}`),
-                    api.get(`/submissions/${assignmentId}/submissions`)
+                    api.get(`/submissions/${assignmentId}/assignments`)
                 ]);
 
                 setAssignment(assignmentRes.data.assignment || assignmentRes.data);

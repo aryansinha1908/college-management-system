@@ -6,6 +6,7 @@ const authMiddleware = require("../middleware/auth.middleware");
 
 router.get('/:id', authMiddleware, courseController.showCourse);
 router.get('/', authMiddleware, courseController.showAllCourses);
+router.get('/:id/professors', authMiddleware, roleMiddleware(['admin', 'professor']), courseController.showAllCoursesOfProfessor);
 
 router.post('/', authMiddleware, roleMiddleware(['admin','professor']), courseController.newCourse);
 

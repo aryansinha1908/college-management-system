@@ -30,6 +30,13 @@ exports.showAllCourses = async () => {
     return courses;
 }
 
+exports.showAllCoursesOfProfessor = async (id) => {
+
+    const courses = await Course.find({ professorId: id });
+
+    return courses;
+}
+
 exports.updateCourse = async (code, userId, data) => {
 
     const updatedCourse = await Course.findOneAndUpdate(

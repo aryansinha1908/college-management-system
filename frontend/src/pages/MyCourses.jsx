@@ -2,8 +2,10 @@ import api from "../api/axios";
 import { useEffect, useState } from "react";
 import { Box, Button, Flex, Heading, Text, Spinner, Alert, AlertIcon, SimpleGrid, Badge, VStack, HStack, Icon, Menu, MenuButton, MenuList, MenuItem, IconButton, Portal } from "@chakra-ui/react";
 import { FiBook, FiMoreVertical, FiEye, FiSettings, FiEdit, FiTrash } from "react-icons/fi";
+import { useAuth } from "../context/AuthContext";
 
 function MyCourses() {
+    const { user } = useAuth();
     const [courses, setCourses] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -11,13 +13,20 @@ function MyCourses() {
     useEffect( () => {
         const fetchData = async () => {
             try {
-                const coursesResponse = await api.get("/courses")
-                const enrollmentsResponse = await api.get("enrollments");
+                if (user.role === 'student'){
+                    const coursesResponse = await api.get("/courses")
+                    const enrollmentsResponse = await api.get("enrollments");
 
-                const enrolledCodes = enrollmentsResponse.data.enrollments;
-                const myFilteredCourses = coursesResponse.data.courses.filter(course => enrolledCodes.includes(course.code));
+                    const enrolledCodes = enrollmentsResponse.data.enrollments;
+                    const myFilteredCourses = coursesResponse.data.courses.filter(course => enrolledCodes.includes(course.code));
 
-                setCourses(myFilteredCourses);
+                    setCourses(myFilteredCourses);
+                } else {
+                    const coursesResponse = await api.get(`/courses/${user._id}/professors`);
+                    const myFilteredCourses = coursesResponse.data.courses;
+
+                    setCourses(myFilteredCourses);
+                }
             } catch (e) {
                 setErrorMessage(e.response?.data?.message || "Failed to load Courses. Please try again later.");
             } finally {
@@ -38,6 +47,22 @@ function MyCourses() {
             setCourses((prev) => prev.filter((course) => course.code !== courseCode));
         } catch (error) {
             console.error(error.response?.data?.message || "Failed to enroll");
+        } finally {
+            setIsLoading(false);
+        }
+    }
+
+    const handleDelete = async (courseCode) => {
+        console.log(`Deleting ${courseCode}`);
+        setIsLoading(true);
+        try {
+            const response = await api.delete(`/courses/${courseCode}`, {
+                data: { code: courseCode }
+            })
+
+            setCourses((prev) => prev.filter((course) => course.code !== courseCode));
+        } catch (error) {
+            console.error(error.response?.data?.message || "Failed to Delete");
         } finally {
             setIsLoading(false);
         }
@@ -64,12 +89,23 @@ function MyCourses() {
 
         return (
         <Box minH="100vh" bg="gray.900" p={8}>
-            <Heading color="white" mb={2}>All Courses</Heading>
-            <Text color="gray.400" mb={8}>View and enroll in Courses.</Text>
+            <Heading color="white" mb={2}>All Your Courses</Heading>
+            { (user.role === "student") ?
+                (
+                <Text color="gray.400" mb={8}>View and enroll in Courses.</Text>
+                ) : (
+                <Text color="gray.400" mb={8}>View and Manage Your Courses.</Text>
+                )
+            }
 
             {courses.length === 0 ? (
                 <Flex bg="gray.800" p={10} rounded="xl" justify="center" border="1px dashed" borderColor="gray.600">
-                    <Text color="gray.500" fontSize="lg">You have not Enrolled in Any Course</Text>
+                    { (user.role === "student") ? (
+                            <Text color="gray.500" fontSize="lg">You have not Enrolled in Any Course</Text>
+                        ): (
+                            <Text color="gray.500" fontSize="lg">You are not Instructor of Any Course</Text>
+                        )
+                    }
                 </Flex>
             ) : (
                 <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6}>
@@ -142,17 +178,32 @@ function MyCourses() {
                                                 >
                                                     Manage
                                                 </MenuItem>
-                                                <MenuItem 
-                                                    icon={<FiTrash />} 
-                                                    bg="transparent" 
-                                                    _hover={{ bg: "red.700", rounded: "md" }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        handleUnenroll(course.code);
-                                                    }}
-                                                >
-                                                        Unenroll
-                                                </MenuItem>
+                                                { (user.role === "student") ? (
+                                                        <MenuItem 
+                                                            icon={<FiTrash />} 
+                                                            bg="transparent" 
+                                                            _hover={{ bg: "red.700", rounded: "md" }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleUnenroll(course.code);
+                                                            }}
+                                                        >
+                                                                Unenroll
+                                                        </MenuItem>
+                                                    ) : (
+                                                        <MenuItem 
+                                                            icon={<FiTrash />} 
+                                                            bg="transparent" 
+                                                            _hover={{ bg: "red.700", rounded: "md" }}
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDelete(course.code);
+                                                            }}
+                                                        >
+                                                                Delete
+                                                        </MenuItem>
+                                                    )
+                                                }
                                             </MenuList>
                                         </Portal>
                                     </Menu>
