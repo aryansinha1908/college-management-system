@@ -14,6 +14,7 @@ import ViewSubmissions from "./pages/ViewSubmissions";
 import CreateCourse from "./pages/CreateCourses";
 import ManageUsers from "./pages/ManageUsers";
 import RegisterUser from "./pages/RegisterUser";
+import Verification from "./pages/Verification";
 
 function App() {
     return (
@@ -149,6 +150,22 @@ function App() {
                             <RegisterUser />
                         </Layout>
                     </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/register"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <RegisterUser />
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route 
+                path="/verification/:token"
+                element={
+                    <Verification />
                 }
             />
         </Routes>

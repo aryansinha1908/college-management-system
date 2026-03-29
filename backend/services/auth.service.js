@@ -30,7 +30,7 @@ const generatePasswordToken = (user) => {
         userId: user._id,
         purpose: "set-password"
     }, process.env.JWT_SECRET, {expiresIn: '14d'});
-    console.log("PasswordToken generated: ", token);
+    // console.log("PasswordToken generated: ", token);
     return token;
 }
 
@@ -46,14 +46,14 @@ exports.register = async (data) => {
     data.isVerified = false;
     data.twoFactorEnabled = false;
 
-    console.log(data);
+    // console.log(data);
     const registered = await User.create({
         ...data,
         password: hashedPassword,
         isVerified: false,
         twoFactorEnabled: false,
     });
-    console.log(registered);
+    // console.log(registered);
     
     if (!registered) {
         throw new Error("Failed to Create User");
@@ -61,13 +61,24 @@ exports.register = async (data) => {
 
     const cleanUser = registered.toObject();
 
-    const hashedToken = hashUtils.hashToken(generatePasswordToken(cleanUser));
+    const token = generatePasswordToken(cleanUser);
+    // console.log(token);
+    const hashedToken = hashUtils.hashToken(token);
+    // console.log(hashedToken);
 
     const passwordToken = await PasswordToken.create({
         userId: cleanUser._id.toString(),
         token: hashedToken,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15)
     });
+
+    const helper = new NodemailerHelper(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+    
+    try{
+        helper.sendEmail(cleanUser.email, 'Verification Email','Please Verify your College Account: ', `http://localhost:5173/verification/${token}`);
+    } catch (error) {
+        throw new Error("Failed To Generate PasswordToken");
+    }
 
     return {
         newUser: registered,
@@ -91,33 +102,55 @@ exports.loginUser = async (email, password, refreshToken) => {
     if (!isValidPassword) {
         throw new Error("Invalid credentials");
     }
-    if (!user.isVerified){
-        throw new Error("Please verify your email");
-    }
 
-    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
-    const existingRefreshToken = await RefreshToken.find({ userId: decoded.userId });
-
-    if (!user.twoFactorEnabled || existingRefreshToken) {
-        // console.log("authService.login Validates");
-        
+    if (!user.twoFactorEnabled && !refreshToken) {
         const accessToken = generateAccessToken(user);
 
         return {
             accessToken: accessToken,
-            refreshToken: existingRefreshToken,
-            user: { _id: user._id, name: user.name, email: user.email, role: user.role }
+            refreshToken: null,
+            twoFactorEnabled: false,
+            user: { _id: user._id, name: user.name, email: user.email, role: user.role },
         };
-    } 
+    }
+
+    if (user.twoFactorEnabled && !refreshToken) {
+        return {
+            accessToken: null,
+            refreshToken: null,
+            twoFactorEnabled: true,
+            user: { _id: user._id, email: user.email }
+        }
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.JWT_SECRET);
+
+    if (!decoded) {
+        throw new Error("Invalid Token");
+    }
+
+    const existingRefreshToken = await RefreshToken.findOne({ userId: user._id });
+
+    if (!existingRefreshToken) {
+        return {
+            accessToken: null,
+            refreshToken: null,
+            twoFactorEnabled: true,
+            user: { _id: user._id, email: user.email }
+        }
+    }
 
     return {
-        twoFactorEnabled: true
-    }
+        accessToken: generateAccessToken(user),
+        refreshToken: existingRefreshToken.token || null,
+        twoFactorEnabled: true,
+        user: { _id: user._id, name: user.name, email: user.email, role: user.role },
+    };
 }
 
 exports.logout = async (refreshToken) => {
-    const token = await RefreshToken.deleteOne({ token: refreshToken });
-
+    const token = await RefreshToken.deleteMany({ token: refreshToken });
+    return;
 }
 
 exports.setPassword = async (token, password) => {
@@ -125,7 +158,7 @@ exports.setPassword = async (token, password) => {
     console.log(token);
     const passwordToken = await PasswordToken.findOne({ token: token });
 
-    console.log(passwordToken);
+    // console.log(passwordToken);
 
     if (!passwordToken || !passwordToken.userId) {
         throw new Error("Invalid Token");
@@ -143,7 +176,7 @@ exports.setPassword = async (token, password) => {
 
     const hashedPassword = await bcrypt.hash(password, 10);
 
-    const updated = await User.updateOne( {_id: passwordToken.userId }, { $set: {password: hashedPassword, isVerified: true} });
+    const updated = await User.updateOne( {_id: passwordToken.userId }, { $set: {password: hashedPassword, isVerified: true, twoFactorEnabled: true} });
     const deleted = await PasswordToken.deleteOne( { _id: passwordToken._id});
 
     return {
@@ -163,12 +196,31 @@ exports.sendOtp = async (userId, email) => {
     });
 
     try{
-        helper.sendEmail(email, 'OTP For Login','Enter the OTP on the Login Page', otp)
+        helper.sendEmail(email, 'OTP For Login','Enter the OTP on the Login Page', otp);
     } catch (error) {
         throw new Error("Failed to Generate OTP");
     }
 
     return otpGenerated;
+}
+
+exports.verifyOtp = async (userId, otp) => {
+
+    const hashedOtp = hashUtils.hashToken(otp);
+    //console.log(hashedOtp);
+
+    const checked = await Otp.findOne({ otp: hashedOtp });
+    const user = await User.findOne({ _id: userId });
+
+    if (!checked) {
+        throw new Error("Invalid OTP");
+    }
+
+    return {
+        accessToken: generateAccessToken(user),
+        refreshToken: generateRefreshToken(user),
+        user: { _id: user._id, name: user.name, email: user.email, role: user.role }
+    }
 }
 
 exports.resetToken = async (refreshToken) => {

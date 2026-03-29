@@ -47,14 +47,20 @@ exports.login = async (req, res, next) => {
             return res.status(400).json({ message: "Email and Password Are Required" });
         }
 
-        const refreshToken = req.cookies?.refreshToken;
+        const refreshToken = req.cookies?.refreshToken || null;
 
         // console.log(email + " " + password);
         const result = await authService.loginUser(email, password, refreshToken);
 
-        res.cookie("accessToken", result.accessToken || null, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 30 * 1000});
-        res.cookie("refreshToken", result.refreshToken || null, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 * 1000});
+        if (result.accessToken) {
+            res.cookie("accessToken", result.accessToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 30 * 1000});
+        }
 
+        if (result.refreshToken) {
+            res.cookie("refreshToken", result.refreshToken, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 * 1000});
+        }
+
+        // console.log(result);
         return res.status(200).json({
             success: true,
             data: result
@@ -143,13 +149,15 @@ exports.resetPassword = async (req, res, next) => {
 
 exports.sendOtp = async (req, res, next) => {
     try {
-        const email  = req.body.email;
+        const { userId, email } = req.body;
+        console.log(userId, email);
 
-        const otp = await authService.sendOtp(email);
+        const otp = await authService.sendOtp(userId, email);
 
         return res.status(200).json({
             success: true,
-            message: "OTP Sent Successfully"
+            message: "OTP Sent Successfully",
+            user: { _id: userId }
         });
     } catch (error) {
         return res.status(500).json({
@@ -161,7 +169,41 @@ exports.sendOtp = async (req, res, next) => {
 }
 
 exports.verifyOtp = async (req, res, next) => {
-    return;
+    try {
+        const { userId, otp } = req.body;
+
+        if (!userId || !otp) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid or Incomplete Data"
+            });
+        }
+
+        const result = await authService.verifyOtp(userId, otp);
+
+        if (!result) {
+            return res.status(401).json({
+                success: false,
+                message: "Invalid OTP"
+            });
+        }
+
+        res.cookie("accessToken", result.accessToken || null, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 30 * 1000});
+        res.cookie("refreshToken", result.refreshToken || null, { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: 'lax', maxAge: 60 * 60 * 24 * 7 * 1000});
+
+
+        return res.status(200).json({
+            success: true,
+            message: "OTP Verified Successfully",
+            result: result
+        })
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "2FA  Failed",
+            error: error.message
+        })
+    }
 }
 
 exports.resetToken = async (req, res, next) => {
