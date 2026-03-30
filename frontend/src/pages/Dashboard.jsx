@@ -1,13 +1,46 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { Box, Flex, Heading, Text, VStack, Spinner, Avatar, Badge, Alert, AlertIcon, CloseButton, Divider, SimpleGrid, Button, Grid, GridItem, CircularProgress, CircularProgressLabel, HStack } from "@chakra-ui/react";
 import { useNavigate } from 'react-router-dom';
+import api from '../api/axios';
 
 function Dashboard() {
     const { user, isLoading } = useAuth();
     const navigate = useNavigate();
-    
+
+    const [totalClasses, setTotalClasses] = useState(0);
+    const [attendedClasses, setAttendedClasses] = useState(0);
     const [hide2FAAlert, setHide2FAAlert] = useState(false);
+
+    useEffect(() => {
+        try {
+            if (user?.role !== 'student') return;
+            
+            const fetchData = async () => {
+                const enrollmentsResponse = await api.get("/enrollments");
+                const courses = enrollmentsResponse.data.enrollments;
+
+                if (!courses || courses.length === 0) return;
+                
+                const attendancePromises = courses.map(async (course) => {
+                    const response = await api.get(`/attendance/${course}/student`);
+
+                    return [course, response.data.attendance];
+                });
+
+                const attendanceArray = await Promise.all(attendancePromises);
+                const totalAttendanceResponse = Object.fromEntries(attendanceArray);
+
+                const allCoursesAttendance = Object.values(totalAttendanceResponse);
+
+                setTotalClasses(allCoursesAttendance.reduce((sum, course) => sum + course.totalClasses, 0));
+                setAttendedClasses(allCoursesAttendance.reduce((sum, course) => sum + course.attendedClasses, 0));
+            }
+            fetchData();
+        } catch (error) {
+            console.error(error.response?.data?.message || "Failed to Fetch Data");
+        }
+    }, []);
 
     if (isLoading) {
         return (
@@ -76,7 +109,7 @@ function Dashboard() {
 
                             {user?.role === 'admin' && (
                                 <SimpleGrid columns={2} spacing={4} w="full">
-                                    <Button colorScheme="red" variant="outline" onClick={() => navigate("/users/register")}>Register User</Button>
+                                    <Button colorScheme="red" variant="outline" onClick={() => navigate("/register")}>Register User</Button>
                                     <Button colorScheme="red" variant="outline" onClick={() => navigate("/create-course")}>New Course</Button>
                                     <Button colorScheme="red" variant="outline" onClick={() => navigate("/update-calendar")}>Update Calendar</Button>
                                     <Button colorScheme="red" variant="outline" onClick={() => navigate("/logs")}>System Logs</Button>
@@ -118,10 +151,12 @@ function Dashboard() {
                             <Box bg="gray.800" p={8} rounded="2xl" shadow="2xl" border="1px solid" borderColor="gray.700" w="full" flex={1}>
                                 <Heading size="md" color="white" mb={6}>Attendance Overview</Heading>
                                 <Flex justify="center" align="center" direction="column">
-                                    <CircularProgress value={85} color="green.400" size="140px" thickness="12px" trackColor="gray.700">
-                                        <CircularProgressLabel color="white" fontWeight="bold" fontSize="2xl">85%</CircularProgressLabel>
+                                    <CircularProgress value={(totalClasses > 0) ? Math.round((attendedClasses / totalClasses) * 100) : 0} color="green.400" size="140px" thickness="12px" trackColor="gray.700">
+                                        <CircularProgressLabel color="white" fontWeight="bold" fontSize="2xl">
+                                            {totalClasses > 0 ? Math.round((attendedClasses/ totalClasses) * 100) : 0}%
+                                        </CircularProgressLabel>
                                     </CircularProgress>
-                                    <Text color="gray.400" mt={4} fontSize="sm">You have attended 34 out of 40 classes this semester.</Text>
+                                    <Text color="gray.400" mt={4} fontSize="sm">You have attended {attendedClasses} out of {totalClasses} classes this semester.</Text>
                                 </Flex>
                             </Box>
 

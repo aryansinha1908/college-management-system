@@ -19,6 +19,13 @@ exports.showUsers = async () => {
     return users;
 }
 
+exports.showStudents = async () => {
+
+    const students = await User.find({ role: 'student' });
+
+    return students;
+}
+
 exports.showProfile = async (userId) => {
     const user = await User.findOne({ _id: userId });
 

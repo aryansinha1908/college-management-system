@@ -80,7 +80,7 @@ exports.showAllCoursesOfProfessor = async (req, res, next) => {
         const id = req.params.id;
 
         const coursesData = await courseService.showAllCoursesOfProfessor(id);
-        console.log(coursesData);
+        // console.log(coursesData);
 
         return res.status(200).json({
             success: true,

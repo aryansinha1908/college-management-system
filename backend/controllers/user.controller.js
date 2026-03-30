@@ -62,6 +62,24 @@ exports.showUsers = async (req, res, next) => {
     }
 }
 
+exports.showStudents = async (req, res, next) => {
+    try {
+        const students = await userService.showStudents();
+
+        return res.status(200).json({
+            success: true,
+            message: "Students Found",
+            students: students
+        });
+    } catch (error) {
+        return res.status(404).json({
+            success: false,
+            message: "Students Not Found",
+            error: error.message
+        });
+    }
+}
+
 exports.updateProfile = async (req, res, next) => {
     try {
         const updateData = req.body;

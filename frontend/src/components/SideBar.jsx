@@ -1,8 +1,9 @@
 import { useAuth } from '../context/AuthContext';
 import { Box, Flex, VStack, Text, Button, Icon, Divider } from '@chakra-ui/react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { FiUser, FiUsers, FiBookOpen, FiFileText, FiCheckSquare, FiCalendar, FiLogOut, FiBook, FiFilePlus } from 'react-icons/fi';
+import { FiUser, FiUsers, FiBookOpen, FiFileText, FiCalendar, FiLogOut, FiBook, } from 'react-icons/fi';
 import { AiOutlineFileText } from "react-icons/ai";
+import { FaRegCalendarAlt } from "react-icons/fa";
 import api from '../api/axios';
 
 function Sidebar() {
@@ -18,6 +19,7 @@ function Sidebar() {
         { id: 'my-courses', name: 'My Courses', path: '/my-courses', roles:['student', 'professor', 'admin'], visible: true, protected: true, icon: FiBook},
         { id: 'assignments', name: 'Assignments', path: '/assignments', roles:['student', 'professor', 'admin'], visible: true, protected:true, icon: FiFileText },
         { id: 'tests', name: 'Tests', path: '/tests', roles:['student', 'professor', 'admin'], visible: true, protected: false, icon: AiOutlineFileText},
+        { id: 'attendance', name: 'Attendance', path: '/attendance', roles:['student', 'professor', 'admin'], visible: false , protected:false , icon: FaRegCalendarAlt},
         { id: 'calendar', name: 'Academic Calendar', path: '/calendar', roles:['student', 'professor', 'admin'], visible: false , protected:false , icon: FiCalendar },
     ];
 

@@ -15,6 +15,7 @@ import CreateCourse from "./pages/CreateCourses";
 import ManageUsers from "./pages/ManageUsers";
 import RegisterUser from "./pages/RegisterUser";
 import Verification from "./pages/Verification";
+import RecordAttendance from "./pages/RecordAttendance";
 
 function App() {
     return (
@@ -31,6 +32,12 @@ function App() {
                 element={
                     <LoginPage />
                 } 
+            />
+            <Route 
+                path="/verification/:token"
+                element={
+                    <Verification />
+                }
             />
             <Route
                 path="/dashboard"
@@ -163,9 +170,13 @@ function App() {
                 }
             />
             <Route 
-                path="/verification/:token"
+                path="/record-attendance/:courseCode"
                 element={
-                    <Verification />
+                    <ProtectedRoute>
+                        <Layout>
+                            <RecordAttendance />
+                        </Layout>
+                    </ProtectedRoute>
                 }
             />
         </Routes>

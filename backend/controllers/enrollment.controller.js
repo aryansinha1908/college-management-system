@@ -25,7 +25,7 @@ exports.enrollUser = async (req, res, next) => {
         return res.status(400).json({
             success: false,
             message: "Failed to Enroll",
-            error: error
+            error: error.message
         })
     }
 }
@@ -53,7 +53,7 @@ exports.unenrollUser = async (req, res, next) => {
         return res.status(400).json({
             success: false,
             message: "Failed to Unenroll",
-            error: error
+            error: error.message
         })
     }
 }
@@ -73,7 +73,7 @@ exports.getUserEnrollments = async (req, res, next) => {
         return res.status(400).json({
             success: false,
             message: "Failed To Retrieve Data",
-            error: error
+            error: error.message
         })
     }
 }
@@ -93,7 +93,7 @@ exports.getStudents = async (req, res, next) => {
         return res.status(400).json({
             success: false,
             message: "Failed To Retrieve Data",
-            error: error
+            error: error.message
         })
     }
 }
@@ -113,7 +113,7 @@ exports.getCourses = async (req, res, next) => {
         return res.status(400).json({
             success: false,
             message: "Failed To Retrieve Data",
-            error: error
+            error: error.message
         })
     }
 }

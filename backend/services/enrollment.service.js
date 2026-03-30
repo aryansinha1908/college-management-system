@@ -3,11 +3,11 @@ const Course = require('../models/course.model');
 
 exports.enroll = async (userId, code) => {
 
-    const course = await Course.findOne({ code: code });
+    // const course = await Course.findOne({ code: code });
 
-    if (!course) {
-        throw new Error("Invalid Data");
-    }
+    // if (!course) {
+    //     throw new Error("Invalid Data");
+    // }
 
     const check = await Enrollment.find(
         {
