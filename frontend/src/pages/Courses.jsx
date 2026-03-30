@@ -4,9 +4,11 @@ import { Box, Button, Flex, Heading, Text, Spinner, Alert, AlertIcon, SimpleGrid
 import { FiBook, FiMoreVertical, FiEye, FiSettings, FiEdit } from "react-icons/fi";
 import api from "../api/axios";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Courses() {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [courses, setCourses] = useState([]); 
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -128,20 +130,10 @@ function Courses() {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         console.log(`Viewing ${course._id}`);
+                                                        navigate(`/courses/${course.code}`);
                                                     }}
                                                 >
                                                     View Course
-                                                </MenuItem>
-                                                <MenuItem 
-                                                    icon={<FiSettings />} 
-                                                    bg="transparent" 
-                                                    _hover={{ bg: "gray.700", rounded: "md" }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        console.log(`Managing ${course._id}`);
-                                                    }}
-                                                >
-                                                    Manage
                                                 </MenuItem>
                                                 <MenuItem 
                                                     icon={<FiEdit />} 

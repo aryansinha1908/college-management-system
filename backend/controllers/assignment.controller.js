@@ -67,6 +67,26 @@ exports.getAssignment = async (req, res, next) => {
     }
 }
 
+exports.getAssignmentsOfCourse = async (req, res, next) => {
+    try {
+        const courseCode = req.params.courseCode;
+
+        const assignments = await assignmentsService.getAssignmentsOfCourse(courseCode);
+
+        return res.status(200).json({
+            success: true,
+            message: "Assignments Found Successfully",
+            assignments: assignments
+        });
+    } catch (error) {
+        return res.status(404).json({
+            success: false,
+            message: "Assignments Not Found",
+            error: error.message
+        })
+    }
+}
+
 exports.createAssignment = async (req, res, next) => {
     try {
         const data = { ...req.body, professorId: req.user.userId };

@@ -150,7 +150,7 @@ exports.resetPassword = async (req, res, next) => {
 exports.sendOtp = async (req, res, next) => {
     try {
         const { userId, email } = req.body;
-        console.log(userId, email);
+        // console.log(userId, email);
 
         const otp = await authService.sendOtp(userId, email);
 

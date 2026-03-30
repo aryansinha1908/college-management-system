@@ -3,9 +3,11 @@ import { useEffect, useState } from "react";
 import { Box, Button, Flex, Heading, Text, Spinner, Alert, AlertIcon, SimpleGrid, Badge, VStack, HStack, Icon, Menu, MenuButton, MenuList, MenuItem, IconButton, Portal } from "@chakra-ui/react";
 import { FiBook, FiMoreVertical, FiEye, FiSettings, FiEdit, FiTrash } from "react-icons/fi";
 import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function MyCourses() {
     const { user } = useAuth();
+    const navigate = useNavigate();
     const [courses, setCourses] = useState([]);
     const [errorMessage, setErrorMessage] = useState('');
     const [isLoading, setIsLoading] = useState(true);
@@ -163,20 +165,10 @@ function MyCourses() {
                                                     onClick={(e) => {
                                                         e.stopPropagation();
                                                         console.log(`Viewing ${course._id}`);
+                                                        navigate(`/courses/${course.code}`);
                                                     }}
                                                 >
                                                     View Course
-                                                </MenuItem>
-                                                <MenuItem 
-                                                    icon={<FiSettings />} 
-                                                    bg="transparent" 
-                                                    _hover={{ bg: "gray.700", rounded: "md" }}
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        console.log(`Managing ${course._id}`);
-                                                    }}
-                                                >
-                                                    Manage
                                                 </MenuItem>
                                                 { (user.role === "student") ? (
                                                         <MenuItem 

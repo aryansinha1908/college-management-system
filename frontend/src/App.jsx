@@ -16,6 +16,8 @@ import ManageUsers from "./pages/ManageUsers";
 import RegisterUser from "./pages/RegisterUser";
 import Verification from "./pages/Verification";
 import RecordAttendance from "./pages/RecordAttendance";
+import Attendance from "./pages/Attendance";
+import Course from "./pages/Course";
 
 function App() {
     return (
@@ -65,6 +67,16 @@ function App() {
                     <ProtectedRoute>
                         <Layout>
                             <MyCourses/>
+                        </Layout>
+                    </ProtectedRoute>
+                }
+            />
+            <Route
+                path="/courses/:courseCode"
+                element={
+                    <ProtectedRoute>
+                        <Layout>
+                            <Course/>
                         </Layout>
                     </ProtectedRoute>
                 }
@@ -160,11 +172,11 @@ function App() {
                 }
             />
             <Route 
-                path="/register"
+                path="/attendance/"
                 element={
                     <ProtectedRoute>
                         <Layout>
-                            <RegisterUser />
+                            <Attendance />
                         </Layout>
                     </ProtectedRoute>
                 }

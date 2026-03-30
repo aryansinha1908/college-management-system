@@ -62,11 +62,12 @@ exports.getUserEnrollments = async (req, res, next) => {
     try {
         const user = req.user;
 
+        // console.log(user);
         const enrollments = await enrollmentService.getEnrollments(user.userId);
 
         return res.status(200).json({
             success: true,
-            message: "Enrollenment Data Retrieved",
+            message: "Enrollment Data Retrieved",
             enrollments: enrollments
         })
     } catch (error) {

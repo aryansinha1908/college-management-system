@@ -38,6 +38,13 @@ exports.getAssignment = async (assignmentId) => {
     return assignment;
 }
 
+exports.getAssignmentsOfCourse = async (courseCode) => {
+    
+    const assignments = await Assignment.find({ courseId: courseCode });
+
+    return assignments;
+}
+
 exports.createAssignment = async (data) => {
 
     const assignment = await Assignment.findOne({ _id: data._id });
