@@ -111,8 +111,6 @@ function Dashboard() {
                                 <SimpleGrid columns={2} spacing={4} w="full">
                                     <Button colorScheme="red" variant="outline" onClick={() => navigate("/register")}>Register User</Button>
                                     <Button colorScheme="red" variant="outline" onClick={() => navigate("/create-course")}>New Course</Button>
-                                    <Button colorScheme="red" variant="outline" onClick={() => navigate("/update-calendar")}>Update Calendar</Button>
-                                    <Button colorScheme="red" variant="outline" onClick={() => navigate("/logs")}>System Logs</Button>
                                 </SimpleGrid>
                             )}
 

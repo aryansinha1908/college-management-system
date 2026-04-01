@@ -3,7 +3,15 @@ const mongoose = require("mongoose");
 const otpSchema = new mongoose.Schema({
     userId: {
         type: String,
-        required: true
+        required: function() {
+            return !this.email; 
+        }
+    },
+    email: {
+        type: String,
+        required: function() {
+            return !this.userId;
+        }
     },
     otp: {
         type: String,
@@ -14,7 +22,7 @@ const otpSchema = new mongoose.Schema({
         default: Date.now,
         expires: 300
     }
-})
+});
 
 const Otp = mongoose.model('Otp', otpSchema);
 module.exports = Otp;

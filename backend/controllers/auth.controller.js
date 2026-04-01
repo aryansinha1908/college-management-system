@@ -136,15 +136,48 @@ exports.setPassword = async (req, res, next) => {
             success: false,
             message: "Password could not be set",
             error: error.message
-        })
+        });
     }
 }
 
 exports.forgotPassword = async (req, res, next) => {
-    return;
+    try {
+        const email = req.body.email;
+
+        const forgotPassword = await authService.forgotPassword(email);
+
+        return res.status(200).json({
+            success: true,
+            message: "Forgot Password Token Generated",
+        })
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "Forgot Password Token Could Not be Generated",
+            error: error.message
+        });
+    }
 }
+
 exports.resetPassword = async (req, res, next) => {
-    return;
+    try {
+        const token = req.params.token;
+        const password = req.body.password;
+
+        const resetPassword = await authService.resetPassword(password, token);
+
+        return res.status(200).json({
+            success: true,
+            message: "Password Reset Successfully",
+            resetPassword: resetPassword
+        })
+    } catch (error) {
+        return res.status(400).json({
+            success: false,
+            message: "Password Could Not be Reset",
+            error: error.message
+        });
+    }
 }
 
 exports.sendOtp = async (req, res, next) => {

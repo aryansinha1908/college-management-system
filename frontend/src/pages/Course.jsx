@@ -2,8 +2,10 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import api from "../api/axios";
 import { useToast, Flex, Spinner, Grid, GridItem, Box, Heading, Text, Button, Badge, VStack, Divider, HStack } from "@chakra-ui/react";
+import { useAuth } from "../context/AuthContext";
 
 function Course() {
+    const { user } = useAuth();
     const toast = useToast();
     const { courseCode } = useParams(); 
 
@@ -152,6 +154,7 @@ function Course() {
 
                             </VStack>
 
+                            { (user.role === 'student')&& (
                             <Box mt="auto" pt={8}>
                                 <Divider borderColor="gray.700" mb={6} />
                                 <Button 
@@ -165,6 +168,7 @@ function Course() {
                                     {enrolled ? "Unenroll from Course" : "Enroll Now"}
                                 </Button>
                             </Box>
+                            )}
                         </Flex>
                     </Box>
                 </GridItem>

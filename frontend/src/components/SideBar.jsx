@@ -18,9 +18,7 @@ function Sidebar() {
         { id: 'courses', name: 'Courses', path: '/courses', roles:['student', 'admin'], visible: true, protected:true, icon: FiBookOpen },
         { id: 'my-courses', name: 'My Courses', path: '/my-courses', roles:['student', 'professor', 'admin'], visible: true, protected: true, icon: FiBook},
         { id: 'assignments', name: 'Assignments', path: '/assignments', roles:['student', 'professor', 'admin'], visible: true, protected:true, icon: FiFileText },
-        { id: 'tests', name: 'Tests', path: '/tests', roles:['student', 'professor', 'admin'], visible: true, protected: false, icon: AiOutlineFileText},
-        { id: 'attendance', name: 'Attendance', path: '/attendance', roles:['student', 'professor', 'admin'], visible: false , protected:false , icon: FaRegCalendarAlt},
-        { id: 'calendar', name: 'Academic Calendar', path: '/calendar', roles:['student', 'professor', 'admin'], visible: false , protected:false , icon: FiCalendar },
+        { id: 'attendance', name: 'Attendance', path: '/attendance', roles:['student'], visible: false , protected:false , icon: FaRegCalendarAlt},
     ];
 
     const visibleNavItems = navItems.filter((item) => item.roles.includes(user.role));

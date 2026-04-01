@@ -18,6 +18,8 @@ import Verification from "./pages/Verification";
 import RecordAttendance from "./pages/RecordAttendance";
 import Attendance from "./pages/Attendance";
 import Course from "./pages/Course";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 
 function App() {
     return (
@@ -39,6 +41,18 @@ function App() {
                 path="/verification/:token"
                 element={
                     <Verification />
+                }
+            />
+            <Route 
+                path="/forgot-password"
+                element={
+                    <ForgotPassword />
+                }
+            />
+            <Route 
+                path="/reset-password/:token"
+                element={
+                    <ResetPassword />
                 }
             />
             <Route

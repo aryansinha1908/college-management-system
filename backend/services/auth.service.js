@@ -155,7 +155,7 @@ exports.logout = async (refreshToken) => {
 
 exports.setPassword = async (token, password) => {
     token = hashUtils.hashToken(token);
-    console.log(token);
+    // console.log(token);
     const passwordToken = await PasswordToken.findOne({ token: token });
 
     // console.log(passwordToken);
@@ -202,6 +202,45 @@ exports.sendOtp = async (userId, email) => {
     }
 
     return otpGenerated;
+}
+
+exports.forgotPassword = async (email) => {
+
+    const helper = new NodemailerHelper(process.env.EMAIL_USER, process.env.EMAIL_PASS);
+    
+    const user = await User.findOne({ email: email });
+
+    const token = jwt.sign({
+        userId: user._id,
+        role: user.role
+    }, process.env.JWT_SECRET, {expiresIn: '10m'});
+
+    const created = await PasswordToken.create({
+        userId: user._id,
+        token: token,
+        expiresAt: new Date(Date.now() + 1000 * 60 * 10)
+    })
+
+    try{
+        helper.sendEmail(email, 'Token For Password Reset','Click on the link to Reset Your Password: ', `http://localhost:5173/reset-password/${token}`);
+    } catch (error) {
+        throw new Error("Failed to Generate Token");
+    }
+}
+
+exports.resetPassword = async (password, token) => {
+
+    const passwordToken = await PasswordToken.findOne({ token: token });
+
+    if (!passwordToken) {
+        throw new Error("Invalid or Expired Token");
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const updated = await User.updateOne( {_id: passwordToken.userId }, { $set: {password: hashedPassword} });
+
+    return updated;
 }
 
 exports.verifyOtp = async (userId, otp) => {
