@@ -1,6 +1,5 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const NodemailerHelper = require('nodemailer-otp');
 const User = require('../models/user.model');
 const PasswordToken = require('../models/passwordToken.model');
 const RefreshToken = require('../models/refreshToken.model');
@@ -71,6 +70,8 @@ exports.register = async (data) => {
         token: hashedToken,
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15)
     });
+
+    const { default: NodemailerHelper } = await import('nodemailer-otp');
 
     const helper = new NodemailerHelper(process.env.EMAIL_USER, process.env.EMAIL_PASS);
     
@@ -185,6 +186,7 @@ exports.setPassword = async (token, password) => {
 }
 
 exports.sendOtp = async (userId, email) => {
+    const { default: NodemailerHelper } = await import('nodemailer-otp');
 
     const helper = new NodemailerHelper(process.env.EMAIL_USER, process.env.EMAIL_PASS);
 

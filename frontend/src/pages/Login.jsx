@@ -19,7 +19,7 @@ const LoginPage = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        console.log("Submitting:", { email, password });
+        // console.log("Submitting:", { email, password });
         setIsLoading(true);
         try {
             const loginResponse = await api.post("/auth/login", {

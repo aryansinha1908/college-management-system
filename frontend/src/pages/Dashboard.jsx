@@ -162,15 +162,15 @@ function Dashboard() {
                                 <Heading size="md" color="white" mb={6}>Recent Grades</Heading>
                                 <VStack spacing={4} align="stretch">
                                     <HStack justify="space-between" p={3} bg="gray.900" rounded="md" border="1px solid" borderColor="gray.700">
-                                        <Text color="white" fontWeight="medium">Data Structures Midterm</Text>
+                                        <Text color="white" fontWeight="medium">Data Structures Class Test</Text>
                                         <Badge colorScheme="green" px={3} py={1} rounded="md">A (92/100)</Badge>
                                     </HStack>
                                     <HStack justify="space-between" p={3} bg="gray.900" rounded="md" border="1px solid" borderColor="gray.700">
-                                        <Text color="white" fontWeight="medium">Linear Algebra Quiz 3</Text>
+                                        <Text color="white" fontWeight="medium">Linear Algebra Test</Text>
                                         <Badge colorScheme="yellow" px={3} py={1} rounded="md">B (84/100)</Badge>
                                     </HStack>
                                     <HStack justify="space-between" p={3} bg="gray.900" rounded="md" border="1px solid" borderColor="gray.700">
-                                        <Text color="white" fontWeight="medium">OS Programming Assignment</Text>
+                                        <Text color="white" fontWeight="medium">OOPs with Java Class Test</Text>
                                         <Badge colorScheme="green" px={3} py={1} rounded="md">A+ (100/100)</Badge>
                                     </HStack>
                                 </VStack>
