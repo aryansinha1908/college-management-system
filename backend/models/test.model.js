@@ -21,6 +21,10 @@ const testSchema = new mongoose.Schema({
             required: true 
         }],
         validate: [arrayLimit, 'A test must have at least one question']
+    },
+    courseId: {
+        type: String,
+        required: true
     }
 }, { timestamps: true });
 

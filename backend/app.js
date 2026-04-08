@@ -10,6 +10,7 @@ const enrollmentRouter = require("./routes/enrollment.routes");
 const gradeRouter = require("./routes/grade.routes");
 const submissionRouter = require("./routes/submission.routes");
 const userRouter = require("./routes/user.routes");
+const testRouter = require("./routes/test.routes");
 
 app.use(express.json());
 app.use(cookieParser());
@@ -28,5 +29,6 @@ app.use("/api/v1/enrollments", enrollmentRouter);
 app.use("/api/v1/grades", gradeRouter);
 app.use("/api/v1/submissions", submissionRouter);
 app.use("/api/v1/users", userRouter);
+app.use("/api/v1/tests", testRouter);
 
 module.exports = app;
