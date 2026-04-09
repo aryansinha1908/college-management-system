@@ -23,7 +23,6 @@ gradeSchema.pre('save', function(next) {
     if (this.isModified('grade')) {
         this.pass = this.grade !== 'F'; 
     }
-    next();
 });
 
 module.exports = mongoose.model('Grade', gradeSchema);
